@@ -259,6 +259,8 @@ let ethnicityMap = {
     "tay": "Tay",
     "nung": "Nùng",
     "muong": "Mường"
+    "san diu": "Sán Dìu"
+    "thai": "Thái"
 };
 
 wifeethnicity = ethnicityMap[normalized] || wifeethnicity;
@@ -274,13 +276,30 @@ await selectDropdown(19,"nơi",false);
 // ========================
 // WIFE ADDRESS
 // ========================
+function formatAddress(str){
+
+return str
+    .toLowerCase() // normalize everything first
+    .split(" ")
+    .map(word => {
+
+        // keep numbers or mixed like 2-2-22 unchanged
+        if(/^[0-9\-]+$/.test(word)){
+            return word;
+        }
+
+        // capitalize first letter only
+        return word.charAt(0).toUpperCase() + word.slice(1);
+    })
+    .join(" ");
+}
 
 let wifeAddr1 = match[10]
 .replace(/"/g,"")
 .replace(/\r/g,"")
 .trim();
 
-let wifeAddress = wifeAddr1;
+let wifeAddress = formatAddress(wifeAddr1);
 
 visible[22].value = wifeAddress;
 visible[22].dispatchEvent(new Event("input",{bubbles:true}));
@@ -350,6 +369,14 @@ let place = text
     .replace(/do/i, "")
     .replace(/hộ chiếu/i, "")
     .replace(/hc số/i, "")
+    .replace(/số/i, "")
+    .replace(/cấp/i, "")
+    .replace(/nơi cấp/i, "")
+    .replace(/:/i, "")
+    .replace(/./i, "")
+    .replace(/,/i, "")
+    .replace(/-/i, "")
+    .replace(/_/i, "")
     .trim();
 
 // clean extra spaces
