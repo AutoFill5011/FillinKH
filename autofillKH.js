@@ -122,10 +122,9 @@ return rows;
 
 let rows=parseCSV(csv).slice(1);
 
-let passport=prompt("Enter passport number");
 let timestamp=prompt("Enter timestamp (d/m/yyyy hh:mm:ss)");
 
-if(!passport||!timestamp){
+if(!timestamp){
 alert("Missing input");
 return;
 }
@@ -141,7 +140,6 @@ let convertedTimestamp=convertFormat(timestamp);
 
 // find matching row
 let match=rows.find(r=>
-r[2] && r[2].trim().toLowerCase()==passport.toLowerCase() &&
 r[0] && r[0].trim()==convertedTimestamp
 );
 
