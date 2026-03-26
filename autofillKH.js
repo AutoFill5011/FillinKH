@@ -171,7 +171,7 @@ if(wifenameParts.length < 2){
 
 // assign parts
 let wifesurname = wifenameParts[0];
-let wifefirstName = wifenameParts[nameParts.length - 1];
+let wifefirstName = wifenameParts[wifenameParts.length - 1];
 let wifemiddleName = wifenameParts.slice(1, -1).join(" ");
 
 // ========================
