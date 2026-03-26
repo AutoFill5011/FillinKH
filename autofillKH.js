@@ -291,6 +291,10 @@ let text = raw
 let passportMatch = text.match(/\b(?=[A-Z0-9]*\d{3,})(?=.*[A-Z])[A-Z0-9]{5,}\b/i);
 let passport = passportMatch ? passportMatch[0] : "";
 
+if(/^\d+$/.test(passport)){
+    passport = "";
+}
+
 // ========================
 // 2. DATE
 // ========================
