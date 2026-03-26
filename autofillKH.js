@@ -221,7 +221,7 @@ let wifeYear = wifeparts[2];
 await selectDropdown(12,wifeDay,false);
 
 // ========================
-//Baby's Month
+//Wife's Month
 await selectDropdown(13,wifeMonth,false);
 
 // ========================
@@ -230,274 +230,128 @@ visible[14].value = wifeYear;
 visible[14].dispatchEvent(new Event("input",{bubbles:true}));
 
 // ========================
-//Baby's Birth place
+//Wife's place
 // ========================
-await selectDropdown(17,"nhật",false);
-
-// ========================
-//Baby's Hometown
-// ========================
-let rawPlace = match[10];
-
-// clean
-let cleanedPlace = rawPlace
-.replace(/"/g,"")
-.replace(/\r/g,"")
-.trim();
-
-// cut at first separator
-let firstWord = cleanedPlace.split(/[ \-_,.]/)[0];
-
-// capitalize
-firstWord = firstWord.charAt(0).toUpperCase() + firstWord.slice(1).toLowerCase();
-
-visible[20].value = firstWord;
-visible[20].dispatchEvent(new Event("input",{bubbles:true}));
+await selectDropdown(18,"nhật",false);
 
 // ========================
-//Baby's Ethnicity
+//Wife's Ethnicity
 // ========================
-let ethnicityRaw = match[12];
+let wifeethnicityRaw = match[8];
 
-let ethnicity = ethnicityRaw
+let wifeethnicity = wifeethnicityRaw
 .replace(/"/g,"")
 .replace(/\r/g,"")
 .trim();
 
 // special conversion
-if(ethnicity === "Tày"){
-ethnicity = "Tay";
+if(wifeethnicity === "Tày"){
+wifeethnicity = "Tay";
 }
 
 // type to filter
-await selectDropdown(25,ethnicity,true);
+await selectDropdown(15,wifeethnicity,true);
 
 // ========================
-// MOTHER NAME
+//Wife's place status
+// ========================
+await selectDropdown(19,"nơi",false);
+
+// ========================
+// WIFE ADDRESS
 // ========================
 
-let motherRaw = match[21];
-
-let motherName = motherRaw
+let wifeAddr1 = match[10]
 .replace(/"/g,"")
 .replace(/\r/g,"")
 .trim();
 
-let motherParts = motherName.split(/\s+/);
+let wifeAddress = wifeAddr1;
 
-let motherSurname="";
-let motherMiddle="";
-let motherFirst="";
+visible[22].value = wifeAddress;
+visible[22].dispatchEvent(new Event("input",{bubbles:true}));
 
-// if only 2 words
-if(motherParts.length == 2){
+// ========================
+// WIFE LEGAL DOCUMENT
+// ========================
 
-motherSurname = motherParts[0];
-motherFirst = motherParts[1];
-motherMiddle = "";
+await selectDropdown(23,"hộ",false);
 
-}else{
+function extractPassportInfo(raw){
 
-motherSurname = motherParts[0];
-motherFirst = motherParts[motherParts.length-1];
-motherMiddle = motherParts.slice(1,-1).join(" ");
+let text = raw
+    .replace(/"/g,"")
+    .replace(/\r/g,"")
+    .trim();
 
+// ========================
+// 1. PASSPORT NUMBER
+// ========================
+// find something like C123456 or MK154125
+let passportMatch = text.match(/\b(?=[A-Z0-9]*\d{3,})(?=.*[A-Z])[A-Z0-9]{5,}\b/i);
+let passport = passportMatch ? passportMatch[0] : "";
+
+// ========================
+// 2. DATE
+// ========================
+let dateMatch = text.match(/\d{1,2}\/\d{1,2}\/\d{4}/);
+let date = dateMatch ? dateMatch[0] : "";
+
+// ========================
+// 3. PLACE
+// ========================
+// remove passport + remove date
+let place = text
+    .replace(passport, "")
+    .replace(date, "")
+    .replace(/cấp ngày/i, "")
+    .replace(/do/i, "")
+    .replace(/hộ chiếu/i, "")
+    .replace(/hc số/i, "")
+    .trim();
+
+// clean extra spaces
+place = place.replace(/\s+/g," ").trim();
+
+return {
+    passport,
+    date,
+    place
+};
 }
+    
+let wifedocRaw = match[11];
 
-// fill inputs
-visible[28].value = motherSurname;
-visible[28].dispatchEvent(new Event("input",{bubbles:true}));
+let wifeinfo = extractPassportInfo(wifedocRaw);
 
-if(motherMiddle !== ""){
-visible[29].value = motherMiddle;
-visible[29].dispatchEvent(new Event("input",{bubbles:true}));
-}
-
-visible[30].value = motherFirst;
-visible[30].dispatchEvent(new Event("input",{bubbles:true}));
+alert(
+"Passport: " + wifeinfo.passport +
+"\nDate: " + wifeinfo.date +
+"\nPlace: " + wifeinfo.place
+);
 
 // ========================
-// MOTHER BIRTH YEAR
+// FIELD 24: PASSPORT NUMBER
 // ========================
-
-let motherYear = match[22]
-.replace(/"/g,"")
-.replace(/\r/g,"")
-.trim();
-
-visible[33].value = motherYear;
-visible[33].dispatchEvent(new Event("input",{bubbles:true}));
+visible[24].value = wifeinfo.passport;
+visible[24].dispatchEvent(new Event("input",{bubbles:true}));
 
 // ========================
-//Mother's Ethnicity
+// FIELD 25: DATE (convert to ddmmyyyy for picker)
 // ========================
-let motherEthnicityRaw = match[23];
+let wifeformattedDate = convertDateMDYtoInput(wifeinfo.date);
 
-let motherEthnicity = motherEthnicityRaw
-.replace(/"/g,"")
-.replace(/\r/g,"")
-.trim();
-
-// special conversion
-if(motherEthnicity === "Tày"){
-motherEthnicity = "Tay";
-}
-
-// type to filter
-await selectDropdown(34,motherEthnicity,true);
+visible[25].focus();
+visible[25].value = wifeformattedDate;
+visible[25].dispatchEvent(new Event("input",{bubbles:true}));
+visible[25].dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",bubbles:true}));
 
 // ========================
-//Mother's city
+// FIELD 26: PLACE
 // ========================
-await selectDropdown(38,"nhật",false);
-
-// ========================
-//Mother's place status
-// ========================
-await selectDropdown(39,"nơi",false);
-
-// ========================
-// MOTHER ADDRESS
-// ========================
-
-let motherAddr1 = match[25]
-.replace(/"/g,"")
-.replace(/\r/g,"")
-.trim();
-
-let motherAddr2 = "";
-
-if(match[26]){
-motherAddr2 = match[26]
-.replace(/"/g,"")
-.replace(/\r/g,"")
-.trim();
-}
-
-let motherAddress = motherAddr1;
-
-if(motherAddr2 !== ""){
-motherAddress = motherAddr1 + ", " + motherAddr2;
-}
-
-visible[42].value = motherAddress;
-visible[42].dispatchEvent(new Event("input",{bubbles:true}));
-
-// ========================
-// FATHER NAME
-// ========================
-
-let fatherRaw = match[15];
-
-let fatherName = fatherRaw
-.replace(/"/g,"")
-.replace(/\r/g,"")
-.trim();
-
-let fatherParts = fatherName.split(/\s+/);
-
-let fatherSurname="";
-let fatherMiddle="";
-let fatherFirst="";
-
-if(fatherParts.length == 2){
-
-fatherSurname = fatherParts[0];
-fatherFirst = fatherParts[1];
-fatherMiddle = "";
-
-}else{
-
-fatherSurname = fatherParts[0];
-fatherFirst = fatherParts[fatherParts.length-1];
-fatherMiddle = fatherParts.slice(1,-1).join(" ");
-
-}
-
-// fill inputs
-visible[48].value = fatherSurname;
-visible[48].dispatchEvent(new Event("input",{bubbles:true}));
-
-if(fatherMiddle !== ""){
-visible[49].value = fatherMiddle;
-visible[49].dispatchEvent(new Event("input",{bubbles:true}));
-}
-
-visible[50].value = fatherFirst;
-visible[50].dispatchEvent(new Event("input",{bubbles:true}));
-
-// ========================
-// FATHER BIRTH YEAR
-// ========================
-
-let fatherYear = match[16]
-.replace(/"/g,"")
-.replace(/\r/g,"")
-.trim();
-
-visible[53].value = fatherYear;
-visible[53].dispatchEvent(new Event("input",{bubbles:true}));
-
-// ========================
-//Father's Ethnicity
-// ========================
-let fatherEthnicityRaw = match[17];
-
-let fatherEthnicity = fatherEthnicityRaw
-.replace(/"/g,"")
-.replace(/\r/g,"")
-.trim();
-
-// special conversion
-if(fatherEthnicity === "Tày"){
-fatherEthnicity = "Tay";
-}
-
-// type to filter
-await selectDropdown(54,fatherEthnicity,true);
-
-// ========================
-//Father's city
-// ========================
-await selectDropdown(58,"nhật",false);
-
-// ========================
-//Father's place status
-// ========================
-await selectDropdown(59,"nơi",false);
-
-// ========================
-// FATHER ADDRESS
-// ========================
-
-let fatherAddr1 = match[19]
-.replace(/"/g,"")
-.replace(/\r/g,"")
-.trim();
-
-let fatherAddr2 = "";
-
-if(match[20]){
-fatherAddr2 = match[20]
-.replace(/"/g,"")
-.replace(/\r/g,"")
-.trim();
-}
-
-let fatherAddress = fatherAddr1;
-
-if(fatherAddr2 !== ""){
-fatherAddress = fatherAddr1 + ", " + fatherAddr2;
-}
-
-visible[62].value = fatherAddress;
-visible[62].dispatchEvent(new Event("input",{bubbles:true}));
-
-
-// ========================
-// APPLICANT NAME CHECK
-// ========================
-
+visible[26].value = wifeinfo.place;
+visible[26].dispatchEvent(new Event("input",{bubbles:true}));
+    
 // helper to clean text
 function cleanText(v){
 return v
@@ -529,80 +383,7 @@ month = String(month).padStart(2,"0");
 day = String(day).padStart(2,"0");
 
 return day + month + year;
-}
-    
-let applicantName = cleanText(match[1]);
-let mName = cleanText(match[21]);
-let fName = cleanText(match[15]);
-
-let valueCol2 = match[2].replace(/"/g,"").replace(/\r/g,"").trim();
-let valueCol3 = match[3].replace(/"/g,"").replace(/\r/g,"").trim();
-let valueCol4 = convertDateMDYtoInput(match[4]);
-
-let issuedPlace = valueCol3;
-// ========================
-// IF MATCH MOTHER
-// ========================
-if(applicantName === mName){
-
-await selectDropdown(43,"hộ",false);
-
-visible[44].value = valueCol2;
-visible[44].dispatchEvent(new Event("input",{bubbles:true}));
-
-visible[45].focus();
-visible[45].value = valueCol4;
-visible[45].dispatchEvent(new Event("input",{bubbles:true}));
-visible[45].dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",bubbles:true}));
-
-visible[46].value = issuedPlace;
-visible[46].dispatchEvent(new Event("input",{bubbles:true}));
-
-}
-
-
-// ========================
-// IF MATCH FATHER
-// ========================
-else if(applicantName === fName){
-
-await selectDropdown(63,"hộ",false);
-
-visible[64].value = valueCol2;
-visible[64].dispatchEvent(new Event("input",{bubbles:true}));
-
-visible[65].focus();
-visible[65].value = valueCol4;
-visible[65].dispatchEvent(new Event("input",{bubbles:true}));
-visible[65].dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",bubbles:true}));
-
-visible[66].value = issuedPlace;
-visible[66].dispatchEvent(new Event("input",{bubbles:true}));
-
-}
-
-
-// ========================
-// NO MATCH
-// ========================
-else{
-
-alert("Kiểm tra lại tên không trùng");
-
-await selectDropdown(63,"hộ",false);
-
-visible[64].value = valueCol2;
-visible[64].dispatchEvent(new Event("input",{bubbles:true}));
-
-visible[65].focus();
-visible[65].value = valueCol4;
-visible[65].dispatchEvent(new Event("input",{bubbles:true}));
-visible[65].dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",bubbles:true}));
-
-visible[66].value = issuedPlace;
-visible[66].dispatchEvent(new Event("input",{bubbles:true}));
-
-}
+}  
 
 alert("Điền form thành công!!!");
 })();
