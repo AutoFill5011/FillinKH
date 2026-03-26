@@ -258,8 +258,8 @@ let ethnicityMap = {
     "kinh": "Kinh",
     "tay": "Tay",
     "nung": "Nùng",
-    "muong": "Mường"
-    "san diu": "Sán Dìu"
+    "muong": "Mường",
+    "san diu": "Sán Dìu",
     "thai": "Thái"
 };
 
