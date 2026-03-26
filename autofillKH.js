@@ -235,22 +235,36 @@ visible[14].dispatchEvent(new Event("input",{bubbles:true}));
 await selectDropdown(18,"nhật",false);
 
 // ========================
-//Wife's Ethnicity
+// Wife's Ethnicity
 // ========================
 let wifeethnicityRaw = match[8];
 
+// normalize base
 let wifeethnicity = wifeethnicityRaw
-.replace(/"/g,"")
-.replace(/\r/g,"")
-.trim();
+    .replace(/"/g,"")
+    .replace(/\r/g,"")
+    .trim()
+    .toLowerCase();
 
-// special conversion
-if(wifeethnicity === "Tày"){
-wifeethnicity = "Tay";
+// remove accents for comparison
+function removeAccent(str){
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g,"");
 }
 
-// type to filter
-await selectDropdown(15,wifeethnicity,true);
+let normalized = removeAccent(wifeethnicity);
+
+// map to correct official values
+let ethnicityMap = {
+    "kinh": "Kinh",
+    "tay": "Tay",
+    "nung": "Nùng",
+    "muong": "Mường"
+};
+
+wifeethnicity = ethnicityMap[normalized] || wifeethnicity;
+
+// use EXACT match now (safe)
+await selectDropdown(15, wifeethnicity, true);
 
 // ========================
 //Wife's place status
@@ -277,6 +291,30 @@ visible[22].dispatchEvent(new Event("input",{bubbles:true}));
 
 await selectDropdown(23,"hộ",false);
 
+function convertDateDMYtoInput(dateStr){
+
+let cleaned = dateStr
+.replace(/"/g,"")
+.replace(/\r/g,"")
+.trim();
+
+let parts = cleaned.split("/");
+
+if(parts.length !== 3){
+return cleaned;
+}
+
+let day = parseInt(parts[0]);
+let month = parseInt(parts[1]);
+let year = parts[2];
+
+// force 2-digit format
+day = String(day).padStart(2,"0");
+month = String(month).padStart(2,"0");
+
+return day + month + year; // ddmmyyyy
+}
+    
 function extractPassportInfo(raw){
 
 let text = raw
@@ -343,8 +381,10 @@ visible[24].dispatchEvent(new Event("input",{bubbles:true}));
 // ========================
 // FIELD 25: DATE (convert to ddmmyyyy for picker)
 // ========================
+let wifeformattedDate = convertDateDMYtoInput(wifeinfo.date);
+
 visible[25].focus();
-visible[25].value = wifeinfo.date;
+visible[25].value = wifeformattedDate;
 visible[25].dispatchEvent(new Event("input",{bubbles:true}));
 visible[25].dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",bubbles:true}));
 
