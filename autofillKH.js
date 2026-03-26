@@ -251,10 +251,10 @@ function removeAccent(str){
     return str.normalize("NFD").replace(/[\u0300-\u036f]/g,"");
 }
 
-let normalized = removeAccent(wifeethnicity);
+let wifenormalized = removeAccent(wifeethnicity);
 
 // map to correct official values
-let ethnicityMap = {
+let wifeethnicityMap = {
     "kinh": "Kinh",
     "tay": "Tay",
     "nung": "Nùng",
@@ -263,7 +263,7 @@ let ethnicityMap = {
     "thai": "Thái"
 };
 
-wifeethnicity = ethnicityMap[normalized] || wifeethnicity;
+wifeethnicity = wifeethnicityMap[wifenormalized] || wifeethnicity;
 
 // use EXACT match now (safe)
 await selectDropdown(15, wifeethnicity, true);
@@ -342,9 +342,8 @@ let text = raw
     .trim();
 
 // ========================
-// 1. PASSPORT NUMBER
+// 1. WIFE PASSPORT NUMBER
 // ========================
-// find something like C123456 or MK154125
 let passportMatch = text.match(/\b(?=[A-Z0-9]*\d{3,})(?=.*[A-Z])[A-Z0-9]{5,}\b/i);
 let passport = passportMatch ? passportMatch[0] : "";
 
@@ -366,8 +365,12 @@ let place = text
     .replace(passport, "")
     .replace(date, "")
     .replace(/cấp ngày/i, "")
+    .replace(/cấp ngày:/i, "")
+    .replace(/ngày/i, "")
+    .replace(/ngày:/i, "")
     .replace(/do/i, "")
     .replace(/hộ chiếu/i, "")
+    .replace(/hộ chiếu:/i, "")
     .replace(/hc số/i, "")
     .replace(/số/i, "")
     .replace(/cấp/i, "")
@@ -377,6 +380,14 @@ let place = text
     .replace(/,/i, "")
     .replace(/-/i, "")
     .replace(/_/i, "")
+    .replace(/. Nơi :/i, "")
+    .replace(/Nơi/i, "")
+    .replace(/Nơi:/i, "")
+    .replace(/nơi/i, "")
+    .replace(/nơi:/i, "")
+    .replace(/. Ngày cấp:/i, "")
+    .replace(/ngày cấp:/i, "")
+    .replace(/ngày cấp/i, "")
     .trim();
 
 // clean extra spaces
@@ -400,13 +411,13 @@ alert(
 );
 
 // ========================
-// FIELD 24: PASSPORT NUMBER
+// WIFE FIELD 24: PASSPORT NUMBER
 // ========================
 visible[24].value = wifeinfo.passport;
 visible[24].dispatchEvent(new Event("input",{bubbles:true}));
 
 // ========================
-// FIELD 25: DATE (convert to ddmmyyyy for picker)
+// WIFE FIELD 25: DATE (convert to ddmmyyyy for picker)
 // ========================
 let wifeformattedDate = convertDateDMYtoInput(wifeinfo.date);
 
@@ -416,7 +427,7 @@ visible[25].dispatchEvent(new Event("input",{bubbles:true}));
 visible[25].dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",bubbles:true}));
 
 // ========================
-// FIELD 26: PLACE
+// WIFE FIELD 26: PLACE
 // ========================
 visible[26].value = wifeinfo.place;
 visible[26].dispatchEvent(new Event("input",{bubbles:true}));
@@ -429,6 +440,180 @@ return v
 .trim()
 .toLowerCase();
 }
+
+// ========================
+// HUSBAND NAME SPLIT
+// ========================
+
+let husbandfullNameRaw = match[15];   // column containing full name
+
+// clean name
+let husbandfullName = husbandfullNameRaw
+    .replace(/"/g,"")
+    .replace(/\r/g,"")
+    .trim();
+
+let husbandnameParts = husbandfullName.split(/\s+/);
+
+if(husbandnameParts.length < 2){
+    alert("Name format error");
+    return;
+}
+
+// assign parts
+let husbandsurname = husbandnameParts[0];
+let husbandfirstName = husbandnameParts[husbandnameParts.length - 1];
+let husbandmiddleName = husbandnameParts.slice(1, -1).join(" ");
+
+// ========================
+// FILL FORM INPUTS
+// ========================
+
+let elements=document.querySelectorAll("input,select,textarea");
+let visible=[];
+
+elements.forEach(el=>{
+if(el.offsetParent!==null) visible.push(el);
+});
+
+// surname
+visible[29].value = husbandsurname;
+visible[29].dispatchEvent(new Event("input",{bubbles:true}));
+
+// middle name(s)
+visible[30].value = husbandmiddleName;
+visible[30].dispatchEvent(new Event("input",{bubbles:true}));
+
+// first name
+visible[31].value = husbandfirstName;
+visible[31].dispatchEvent(new Event("input",{bubbles:true}));
+    
+// ========================
+// HUSBAND DATE OF BIRTH
+// ========================
+
+let husbanddobRaw = match[];
+
+// clean
+let husbanddob = husbanddobRaw
+.replace(/"/g,"")
+.replace(/\r/g,"")
+.trim();
+
+// split
+let husbandparts = husbanddob.split("/");
+
+let husbandMonth = parseInt(husbandparts[0]).toString();
+let husbandDay = parseInt(husbandparts[1]).toString();
+let husbandYear = husbandparts[2];
+
+// ========================
+//husband's Day
+await selectDropdown(32,husbandDay,false);
+
+// ========================
+//husband's Month
+await selectDropdown(33,husbandMonth,false);
+
+// ========================
+//husband's Year
+visible[34].value = husbandYear;
+visible[34].dispatchEvent(new Event("input",{bubbles:true}));
+
+// ========================
+//husband's place
+// ========================
+await selectDropdown(38,"nhật",false);
+
+// ========================
+// Wife's Ethnicity
+// ========================
+let husbandethnicityRaw = match[17];
+
+// normalize base
+let husbandethnicity = husbandethnicityRaw
+    .replace(/"/g,"")
+    .replace(/\r/g,"")
+    .trim()
+    .toLowerCase();
+
+// remove accents for comparison
+function removeAccent(str){
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+}
+
+let husbandnormalized = removeAccent(husbandethnicity);
+
+// map to correct official values
+let husbandethnicityMap = {
+    "kinh": "Kinh",
+    "tay": "Tay",
+    "nung": "Nùng",
+    "muong": "Mường",
+    "san diu": "Sán Dìu",
+    "thai": "Thái"
+};
+
+husbandethnicity = husbandethnicityMap[husbandnormalized] || husbandethnicity;
+
+// use EXACT match now (safe)
+await selectDropdown(35, husbandethnicity, true);
+
+// ========================
+//husband's place status
+// ========================
+await selectDropdown(39,"nơi",false);
+
+// ========================
+// HUSBAND ADDRESS
+// ========================
+let husbandAddr1 = match[19]
+.replace(/"/g,"")
+.replace(/\r/g,"")
+.trim();
+
+let husbandAddress = formatAddress(husbandAddr1);
+
+visible[22].value = husbandAddress;
+visible[22].dispatchEvent(new Event("input",{bubbles:true}));
+
+// ========================
+// HUSBAND LEGAL DOCUMENT
+// ========================
+
+await selectDropdown(43,"hộ",false);
+
+let husbanddocRaw = match[20];
+
+let husbandinfo = extractPassportInfo(husbanddocRaw);
+
+alert(
+"Passport: " + husbandinfo.passport +
+"\nDate: " + husbandinfo.date +
+"\nPlace: " + husbandinfo.place
+);
+
+// ========================
+// HUSBAND: PASSPORT NUMBER
+// ========================
+visible[44].value = husbandinfo.passport;
+visible[44].dispatchEvent(new Event("input",{bubbles:true}));
+
+// ========================
+// HUSBAND: DATE (convert to ddmmyyyy for picker)
+// ========================
+let husbandformattedDate = convertDateDMYtoInput(husbandinfo.date);
+
+visible[45].focus();
+visible[45].value = husbandformattedDate;
+visible[45].dispatchEvent(new Event("input",{bubbles:true}));
+visible[45].dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",bubbles:true}));
+
+// ========================
+// HUSBAND: PLACE
+// ========================
+visible[46].value = husbandinfo.place;
+visible[46].dispatchEvent(new Event("input",{bubbles:true}));
     
 alert("Điền form thành công!!!");
 })();
