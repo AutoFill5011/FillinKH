@@ -154,7 +154,7 @@ return;
 // WIFE NAME SPLIT
 // ========================
 
-let wifefullNameRaw = match[5];   // column containing full name
+let wifefullNameRaw = match[6];   // column containing full name
 
 // clean name
 let wifefullName = wifefullNameRaw
@@ -201,7 +201,7 @@ visible[11].dispatchEvent(new Event("input",{bubbles:true}));
 // WIFE DATE OF BIRTH
 // ========================
 
-let wifedobRaw = match[6];
+let wifedobRaw = match[7];
 
 // clean
 let wifedob = wifedobRaw
