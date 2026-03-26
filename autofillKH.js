@@ -465,17 +465,6 @@ let husbandsurname = husbandnameParts[0];
 let husbandfirstName = husbandnameParts[husbandnameParts.length - 1];
 let husbandmiddleName = husbandnameParts.slice(1, -1).join(" ");
 
-// ========================
-// FILL FORM INPUTS
-// ========================
-
-let elements=document.querySelectorAll("input,select,textarea");
-let visible=[];
-
-elements.forEach(el=>{
-if(el.offsetParent!==null) visible.push(el);
-});
-
 // surname
 visible[29].value = husbandsurname;
 visible[29].dispatchEvent(new Event("input",{bubbles:true}));
