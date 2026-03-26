@@ -343,10 +343,8 @@ visible[24].dispatchEvent(new Event("input",{bubbles:true}));
 // ========================
 // FIELD 25: DATE (convert to ddmmyyyy for picker)
 // ========================
-let wifeformattedDate = convertDateMDYtoInput(wifeinfo.date);
-
 visible[25].focus();
-visible[25].value = wifeformattedDate;
+visible[25].value = wifeinfo.date;
 visible[25].dispatchEvent(new Event("input",{bubbles:true}));
 visible[25].dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",bubbles:true}));
 
@@ -365,29 +363,5 @@ return v
 .toLowerCase();
 }
     
-function convertDateMDYtoInput(dateStr){
-
-let cleaned = dateStr
-.replace(/"/g,"")
-.replace(/\r/g,"")
-.trim();
-
-let parts = cleaned.split("/");
-
-if(parts.length !== 3){
-return cleaned;
-}
-
-let month = parseInt(parts[0]);
-let day = parseInt(parts[1]);
-let year = parts[2];
-
-// force 2-digit format
-month = String(month).padStart(2,"0");
-day = String(day).padStart(2,"0");
-
-return day + month + year;
-}  
-
 alert("Điền form thành công!!!");
 })();
