@@ -481,7 +481,7 @@ visible[31].dispatchEvent(new Event("input",{bubbles:true}));
 // HUSBAND DATE OF BIRTH
 // ========================
 
-let husbanddobRaw = match[];
+let husbanddobRaw = match[16];
 
 // clean
 let husbanddob = husbanddobRaw
