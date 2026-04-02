@@ -613,8 +613,8 @@ let registeredNumber = match[26];
 visible[70].value = registeredNumber;
 visible[70].dispatchEvent(new Event("input",{bubbles:true}));
 
-let registeredNumber = match[25];
-visible[71].value = registeredNumber;
+let registeredPlace = match[25];
+visible[71].value = registeredPlace;
 visible[71].dispatchEvent(new Event("input",{bubbles:true}));
 
 function convertDate(date){
