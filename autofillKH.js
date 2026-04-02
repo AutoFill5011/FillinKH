@@ -122,7 +122,7 @@ return rows;
 
 let rows=parseCSV(csv).slice(1);
 
-let timestamp=prompt("Enter timestamp (d/m/yyyy hh:mm:ss)");
+let timestamp=prompt("Thời gian của tờ khai");
 
 if(!timestamp){
 alert("Missing input");
@@ -130,17 +130,17 @@ return;
 }
 
 // convert timestamp
-function convertFormat(input){
-const [datePart,timePart]=input.split(" ");
-const [day,month,year]=datePart.split("/");
-return `${month}/${day}/${year} ${timePart}`;
-}
+//function convertFormat(input){
+//const [datePart,timePart]=input.split(" ");
+//const [day,month,year]=datePart.split("/");
+//return `${month}/${day}/${year} ${timePart}`;
+//}
 
-let convertedTimestamp=convertFormat(timestamp);
+//let convertedTimestamp=convertFormat(timestamp);
 
 // find matching row
 let match=rows.find(r=>
-r[0] && r[0].trim()==convertedTimestamp
+r[0] && r[0].trim()==timestamp
 );
 
 if(!match){
@@ -404,11 +404,11 @@ let wifedocRaw = match[11];
 
 let wifeinfo = extractPassportInfo(wifedocRaw);
 
-alert(
-"Passport: " + wifeinfo.passport +
-"\nDate: " + wifeinfo.date +
-"\nPlace: " + wifeinfo.place
-);
+//alert(
+//"Passport: " + wifeinfo.passport +
+//"\nDate: " + wifeinfo.date +
+//"\nPlace: " + wifeinfo.place
+//);
 
 // ========================
 // WIFE FIELD 24: PASSPORT NUMBER
@@ -576,11 +576,11 @@ let husbanddocRaw = match[20];
 
 let husbandinfo = extractPassportInfo(husbanddocRaw);
 
-alert(
-"Passport: " + husbandinfo.passport +
-"\nDate: " + husbandinfo.date +
-"\nPlace: " + husbandinfo.place
-);
+//alert(
+//"Passport: " + husbandinfo.passport +
+//"\nDate: " + husbandinfo.date +
+//"\nPlace: " + husbandinfo.place
+//);
 
 // ========================
 // HUSBAND: PASSPORT NUMBER
@@ -603,6 +603,50 @@ visible[45].dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",bubbles:true}
 // ========================
 visible[46].value = husbandinfo.place;
 visible[46].dispatchEvent(new Event("input",{bubbles:true}));
+
+// ========================
+//Registered Place
+// ========================
+await selectDropdown(69,"nhật",false);
+
+let registeredNumber = match[26];
+visible[70].value = registeredNumber;
+visible[70].dispatchEvent(new Event("input",{bubbles:true}));
+
+let registeredNumber = match[25];
+visible[71].value = registeredNumber;
+visible[71].dispatchEvent(new Event("input",{bubbles:true}));
+
+function convertDate(date){
+
+let convert = date
+.replace(/"/g,"")
+.replace(/\r/g,"")
+.trim();
+
+let part = convert.split("/");
+
+if(part.length !== 3){
+return convert;
+}
+
+let d = parseInt(part[1]);
+let m = parseInt(part[0]);
+let y = part[2];
+
+// force 2-digit format
+d = String(d).padStart(2,"0");
+m = String(m).padStart(2,"0");
+
+return d + m + y; // ddmmyyyy
+}
+
+let registeredDate = convertDate(match[27]);
+
+visible[72].focus();
+visible[72].value = registeredDate;
+visible[72].dispatchEvent(new Event("input",{bubbles:true}));
+visible[72].dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",bubbles:true}));
     
 alert("Điền form thành công!!!");
 })();
